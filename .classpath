@@ -7,5 +7,20 @@
 			<attribute name="javadoc_location" value="http://twitter4j.org/javadoc"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/json-simple-2.3.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/statys/lib/json-simple-2.3.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/twitter4j-stream-4.0.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/statys/lib/twitter4j-stream-4.0.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/twitter4j-async-4.0.4.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/statys/lib/twitter4j-async-4.0.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
