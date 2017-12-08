@@ -1,22 +1,32 @@
 package com.github.statys;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 import com.github.statys.io.FileReader;
 
+import twitter4j.DirectMessage;
+import twitter4j.FilterQuery;
+import twitter4j.ResponseList;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
+import twitter4j.StatusUpdate;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
-import twitter4j.UserMentionEntity;
+import twitter4j.User;
+import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
-public class Launcher {
+public class Launcher implements Runnable{
 
 	private static Launcher instance;
+	private static TwitterStream ts;
+	private static Twitter twitter;
+	private static final String[] keywords = {"StatysUnicode"};
 	
 	private Launcher() {
 		Launcher.instance = this;
@@ -49,21 +59,22 @@ public class Launcher {
 		  .setOAuthAccessToken(accesstoken)
 		  .setOAuthAccessTokenSecret(accesstokensecret);
 		
-		TwitterStreamFactory tf = new TwitterStreamFactory(cb.build());
-	    TwitterStream ts = tf.getInstance();
+		Configuration config = cb.build();
+		
+		TwitterStreamFactory tf = new TwitterStreamFactory(config);
+	    ts = tf.getInstance();
+	    twitter = new TwitterFactory(config).getInstance();
 		
 	    ts.addListener(new StatusListener() {
 
 			@Override
 			public void onException(Exception arg0) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
@@ -75,48 +86,56 @@ public class Launcher {
 			@Override
 			public void onStallWarning(StallWarning warning) {
 				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
 			public void onStatus(Status status) {
-				boolean foundMyself = false;
-				
-				for(UserMentionEntity e : status.getUserMentionEntities()) {
-					if(e.getName().equalsIgnoreCase("@StatysUnicode")) {
-						foundMyself = true;
+				System.out.println(status);
+				String text = status.getText();
+				User user = status.getUser();
+				if (text.contains("@"+ keywords[0]) && !user.getName().equals(keywords[0])) {
+					String name = user.getScreenName();
+					System.out.println("User " + name + " has send : "+ status.getText());
+					try {
+						StatusUpdate stUpdate = new StatusUpdate("@" + name + " S'il vous plaît, veuillez me suivre afin de pouvoir vous aider en DM.");
+						stUpdate = stUpdate.inReplyToStatusId(status.getId());
+						twitter.updateStatus(stUpdate);
+						twitter.createFriendship(name);
+					} 
+					catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
-				
-				if(foundMyself) {
-					System.out.println(status);
-				}
-				
 			}
 
 			@Override
 			public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
 				// TODO Auto-generated method stub
-				
 			}
 	    	
 	    });
 	    
-	    ts.sample();
-	    System.out.println(ts);
+	    FilterQuery filter = new FilterQuery();
+	    filter.track(keywords);
+	    Thread thread = new Thread(Launcher.instance);
+	    thread.start();
+	    ts.filter(filter);	
 	    
-	    Scanner sc = new Scanner(System.in);
-	    sc.next();
 	    
-	    /*
-	    try {
-	    	while(true) {
-	    		
+	}
+
+	@Override
+	public void run() 
+	{
+		try {
+	    	ResponseList<DirectMessage> dm = twitter.getDirectMessages();
+	    	for (DirectMessage message : dm)
+	    	{
+	    		System.out.println(message.getText());
 	    	}
-	    } catch (TwitterException e) {
+		} catch (TwitterException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
-		
-	    
+		}
 	}
 }
