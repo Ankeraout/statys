@@ -66,57 +66,6 @@ public class Launcher {
 	    twitterStream = tf.getInstance();
 	    twitter = new TwitterFactory(config).getInstance();
 		
-	    /*twitterStream.addListener(new StatusListener() {
-
-			@Override
-			public void onException(Exception arg0) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onScrubGeo(long userId, long upToStatusId) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onStallWarning(StallWarning warning) {
-				// TODO Auto-generated method stub
-			}
-
-			@Override
-			public void onStatus(Status status) {
-				String text = status.getText();
-				User user = status.getUser();
-				if (text.contains("@"+ keywords[0])) {
-					String name = user.getScreenName();
-					System.out.println("User " + name + " has send : "+ status.getText());
-					if (!name.equals(keywords[0])) {
-						try {
-							StatusUpdate stUpdate = new StatusUpdate("@" + name + " S'il vous plaît, veuillez me suivre afin de pouvoir vous aider en DM.");
-							stUpdate = stUpdate.inReplyToStatusId(status.getId());
-							twitter.updateStatus(stUpdate);
-							twitter.createFriendship(name);
-						} 
-						catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
-
-			@Override
-			public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
-				// TODO Auto-generated method stub
-			}
-	    	
-	    });
-	    */
 	    twitterStream.addListener(new UserStreamListener() {
 
 			@Override
@@ -137,7 +86,7 @@ public class Launcher {
 				
 			}
 
-			@Override
+			@Override // EASTER EGG : Taper @StatysUnicode man Statys
 			public void onStatus(Status status) {
 				String text = status.getText();
 				User user = status.getUser();
@@ -145,8 +94,14 @@ public class Launcher {
 					String name = user.getScreenName();
 					System.out.println("User " + name + " has send : "+ status.getText());
 					if (!name.equals(keywords[0])) {
+						String message = "";
+						if (text.equals("@" + keywords[0] + " man Statys")) {
+							message = " Read the freaking manual !";
+						} else {
+							message = " S'il vous plaît, veuillez me suivre afin de pouvoir vous aider en DM.";
+						}
 						try {
-							StatusUpdate stUpdate = new StatusUpdate("@" + name + " S'il vous plaît, veuillez me suivre afin de pouvoir vous aider en DM.");
+							StatusUpdate stUpdate = new StatusUpdate("@" + name + message);
 							stUpdate = stUpdate.inReplyToStatusId(status.getId());
 							twitter.updateStatus(stUpdate);
 							twitter.createFriendship(name);
@@ -310,6 +265,7 @@ public class Launcher {
 			}
 	    });
 	    
+	    // Lancer les threads d'écoute
 	    twitterStream.user();
 	}
 }
